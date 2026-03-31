@@ -19,7 +19,8 @@ Themed: Specifically designed to match the Ultrachromic / Kaleidochromic visual 
 📸 Screenshots
 Home Screen Integration
 Calendar Popup View
-<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 15 52 00" src="https://github.com/user-attachments/assets/37cbf120-6c16-4e9a-981d-41529683961c" />
+<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 16 15 03" src="https://github.com/user-attachments/assets/ef18ed8b-43d4-494b-8cb5-b412060245a5" />
+
 <img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 15 52 04" src="https://github.com/user-attachments/assets/a34047f4-7d50-4aa4-86ba-cafe36635489" />
 
 📋 Requirements
