@@ -1,71 +1,82 @@
-📅 Jellyfin Calendar Tab
-A custom tab for Jellyfin that opens a "Coming Up" popup directly on the home screen — styled with a glassmorphism effect to match the Ultrachromic theme.
+# 📅 Jellyfin Calendar Tab
 
-✨ Features
-Integrated UI: Calendar icon tab placed next to Bookmarks, Watchlist, etc.
+A custom tab for Jellyfin that opens a **"Coming Up"** popup directly on the home screen — styled with a sleek glassmorphism effect to perfectly match the **Ultrachromic** theme.
 
-Glassmorphism Popup: Click opens a sleek overlay over the home screen — no page navigation.
+---
 
-Smart Date Range: Automatically shows only the next 7 days from today.
+## ✨ Features
 
-Series Focus: Always loads series posters (not episode thumbnails) for a cleaner look.
+* **Integrated UI:** Adds a dedicated "Calendar" icon tab right next to Bookmarks, Watchlist, and other home screen tabs.
+* **Glassmorphism Popup:** Opens a stylish, semi-transparent overlay directly over the home screen — no disruptive page navigation required.
+* **Smart Date Range:** Automatically calculates and displays releases for the next **7 days** starting from today.
+* **Series Focus:** Always prioritizes high-quality series posters instead of episode thumbnails for a cleaner, more aesthetic look.
+* **Direct Navigation:** One click on a card takes you instantly to the series detail page.
+* **Easy Exit:** Quickly close the view via the **✕** button or by hitting the **ESC** key.
+* **Themed:** Custom-tailored to align with the visual style of **Ultrachromic / Kaleidochromic**.
 
-Direct Navigation: Click on a card opens the series detail page instantly.
+---
 
-Easy Exit: Close via the ✕ button or ESC key.
+## 📸 Screenshots
 
-Themed: Specifically designed to match the Ultrachromic / Kaleidochromic visual style.
+### Home Screen Integration
+<img width="1440" height="900" alt="Home Screen Tab Integration" src="https://github.com/user-attachments/assets/ef18ed8b-43d4-494b-8cb5-b412060245a5" />
 
-📸 Screenshots
-Home Screen Integration
-Calendar Popup View
-<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 16 15 03" src="https://github.com/user-attachments/assets/ef18ed8b-43d4-494b-8cb5-b412060245a5" />
+### Calendar Popup View
+<img width="1440" height="900" alt="Calendar Glassmorphism View" src="https://github.com/user-attachments/assets/a34047f4-7d50-4aa4-86ba-cafe36635489" />
 
-<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 15 52 04" src="https://github.com/user-attachments/assets/a34047f4-7d50-4aa4-86ba-cafe36635489" />
+---
 
-📋 Requirements
-Jellyfin Server 10.8+
+## 📋 Requirements
 
-Plugin: Custom Tabs — required for the tab button to appear.
+* **Jellyfin Server 10.8+**
+* **Plugin:** [Custom Tabs](https://github.com/c9970/jellyfin-plugin-customtabs) — **Required** to inject the tab button into the UI.
 
-🚀 Installation
-Step 1 — Create the Custom Tab ⚠️ Required
-The Custom Tab plugin is required. Without it, the tab button will not appear on the home screen.
+---
 
-Open the Jellyfin Dashboard.
+## 🚀 Installation
 
-Go to Plugins → Custom Tabs.
+### Step 1 — Create the Custom Tab ⚠️
+The *Custom Tabs* plugin acts as the anchor. Without this step, the script won't find a button to hook into.
 
-Click Add Tab and fill in:
+1.  Open your **Jellyfin Dashboard**.
+2.  Navigate to **Plugins** → **Custom Tabs**.
+3.  Click **Add Tab** and enter the following:
+    * **Display Text:** `Calender` 
+    * **HTML Content:** *Leave this completely empty.*
+4.  **Save.**
 
-Display Text: Calender ← must be spelled exactly like this (the script looks for this string).
+> [!IMPORTANT]  
+> The tab name must be spelled exactly **Calender**. The script specifically searches for the string "calend" to attach the popup logic. If renamed, the trigger will fail.
 
-HTML Content: Leave completely empty.
+### Step 2 — Add the JavaScript & CSS
+1.  Go to **Jellyfin Dashboard** → **General**.
+2.  Locate the **Custom JavaScript code** field.
+3.  Paste the full contents of [`calendar.js`](./calendar.js) into the field.
+4.  Locate the **Custom CSS code** field.
+5.  Paste the contents of [`custom.css`](./custom.css).
+6.  **Save** and refresh your browser.
 
-Save.
+---
 
-⚠️ The tab name must be Calender. The JavaScript searches for a tab button whose text contains calend — if you rename it, the script will not find the trigger.
+## 📁 Files
 
-Step 2 — Add the JavaScript
-Go to Jellyfin Dashboard → General → JS Injector.
+| File | Description |
+| :--- | :--- |
+| `calendar.js` | Main logic: Tab patching, popup rendering, and API data fetching. |
+| `custom.css` | Stylesheet: Glassmorphism effects, Ultrachromic imports, and icon styling. |
+| `README.md` | This documentation. |
 
-Paste the full contents of calendar.js into the Custom JavaScript field.
+---
 
-Save and reload the page.
+## ⚠️ Logic & Known Issues
 
-📁 Files
-File	Description
-calendar.js	Main script — tab patching, popup logic, API calls.
-custom.css	Full CSS including Ultrachromic imports and tab icon styles.
-README.md	This documentation.
-⚠️ Important Logic & Known Issues
-Empty Days: If a specific day (e.g., Thursday) has no scheduled releases in your library, that heading will be skipped and not displayed at all.
+* **Empty Days:** If a specific day (e.g., Thursday) has no scheduled releases in your library, the heading for that day will be hidden.
+* **Missing Data:** If the Jellyfin API returns no upcoming items for the entire 7-day window, the calendar will appear empty.
+* **API Filtering:** Since some Jellyfin versions handle date parameters inconsistently, the script fetches up to 500 upcoming items and performs client-side filtering for accuracy.
+* **Scope:** The tab is designed to appear only on the **Home Screen**. It is intentionally not visible on library sub-pages (Movies/Series).
 
-Missing Data: If the Jellyfin API provides no data/items for the entire 7-day range, the calendar will remain empty or not show items for those specific dates.
+---
 
-API Filtering: The Shows/Upcoming API ignores MinPremiereDate / MaxPremiereDate parameters in some versions, so the script loads up to 500 items and filters them client-side.
+## 📄 License
 
-Scope: The tab only appears on the Home Screen, not on library subpages (Series, Movies, etc.).
-
-📄 License
-MIT — free to use and modify.
+**MIT** — Feel free to use, modify, and share!
