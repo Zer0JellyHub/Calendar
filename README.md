@@ -22,7 +22,7 @@ A custom tab for Jellyfin that opens a **"Coming Up"** popup directly on the hom
 <img width="1440" height="900" alt="Home Screen Tab Integration" src="https://github.com/user-attachments/assets/ef18ed8b-43d4-494b-8cb5-b412060245a5" />
 
 ### Calendar Popup View
-<img width="1440" height="900" alt="Calendar Glassmorphism View" src="https://github.com/user-attachments/assets/a34047f4-7d50-4aa4-86ba-cafe36635489" />
+<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 19 09 47" src="https://github.com/user-attachments/assets/07e7084d-759a-4b79-9842-e1446168f14b" />
 
 ---
 
