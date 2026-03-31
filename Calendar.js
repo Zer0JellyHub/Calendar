@@ -18,8 +18,7 @@
     }
     #jf-overlay-header {
       display:flex; align-items:center; justify-content:space-between;
-      padding:14px 3.5%;
-      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:14px 3.5%; border-bottom:1px solid rgba(255,255,255,.12);
       flex-shrink:0; background:rgba(0,0,0,.2); gap:12px;
     }
     #jf-overlay-title {
@@ -30,8 +29,8 @@
     #jf-overlay-close {
       background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
       color:rgba(255,255,255,.85); border-radius:50%;
-      width:34px; height:34px; font-size:1em;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      width:34px; height:34px; font-size:1em; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
       flex-shrink:0; transition:background .2s;
     }
     #jf-overlay-close:hover { background:rgba(255,255,255,.22); color:#fff; }
@@ -41,22 +40,19 @@
     }
     #jf-day-nav::-webkit-scrollbar { display:none; }
     .jf-day-btn {
-      background:rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
       color:rgba(255,255,255,.7); border-radius:8px;
       padding:5px 10px; cursor:pointer; flex-shrink:0;
       font-size:.78em; line-height:1.3; text-align:center;
-      transition:background .15s, border-color .15s, color .15s;
-      min-width:56px;
+      transition:background .15s, border-color .15s, color .15s; min-width:56px;
     }
     .jf-day-btn:hover { background:rgba(255,255,255,.14); color:#fff; }
     .jf-day-btn.active {
-      background:rgba(255,255,255,.22);
-      border-color:rgba(255,255,255,.5);
+      background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.5);
       color:#fff; font-weight:500;
     }
-    .jf-day-btn.empty { opacity:.35; }
-    .jf-day-btn .btn-day { display:block; font-size:1em; }
+    .jf-day-btn.empty { opacity:.4; }
+    .jf-day-btn .btn-day { display:block; }
     .jf-day-btn .btn-date { display:block; font-size:.9em; opacity:.6; }
     #jf-overlay-body {
       flex:1; overflow-y:auto; padding:0 3.5% 3em;
@@ -70,20 +66,14 @@
       margin:0 0 .6em; color:rgba(255,255,255,.9);
     }
     .jf-cards { display:flex; flex-wrap:wrap; gap:12px; }
-    .jf-card {
-      width:150px; flex-shrink:0; cursor:pointer;
-      transition:transform .2s, opacity .2s;
-    }
+    .jf-card { width:150px; flex-shrink:0; cursor:pointer; transition:transform .2s, opacity .2s; }
     .jf-card:hover { transform:scale(1.05); opacity:.85; }
     .jf-card-img {
       width:150px; height:225px; border-radius:8px; overflow:hidden;
       background:rgba(255,255,255,.06); position:relative;
       border:1px solid rgba(255,255,255,.08);
     }
-    .jf-card-img img {
-      position:absolute; inset:0; width:100%; height:100%;
-      object-fit:cover; display:block;
-    }
+    .jf-card-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
     .jf-dub-badge {
       position:absolute; top:6px; left:6px;
       background:rgba(0,0,0,.75); border:1px solid rgba(255,255,255,.2);
@@ -92,17 +82,13 @@
     }
     .jf-card-t {
       font-size:.82em; margin-top:6px; text-align:center;
-      color:rgba(255,255,255,.9); overflow:hidden;
-      text-overflow:ellipsis; white-space:nowrap; font-weight:400;
+      color:rgba(255,255,255,.9); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
     .jf-card-s {
       font-size:.74em; color:rgba(255,255,255,.45); text-align:center;
       overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
-    .jf-no-ep {
-      padding:1.2em 0; color:rgba(255,255,255,.2);
-      font-size:.85em; font-style:italic;
-    }
+    .jf-no-ep { padding:1.5em 0; color:rgba(255,255,255,.25); font-size:.88em; font-style:italic; }
     .jf-spinner { padding:3em; text-align:center; color:rgba(255,255,255,.4); }
     @media(max-width:600px){
       .jf-card,.jf-card-img { width:calc(33vw - 14px); height:calc((33vw - 14px)*1.5); }
@@ -128,21 +114,64 @@
     });
   };
 
+  const buildCards = (items, server, token) => {
+    if (!items.length) return `<div class="jf-no-ep">No episodes scheduled for this day / No information available.</div>`;
+    return items.map(item => {
+      const sid = item.SeriesId || item.Id;
+      const tag = item.SeriesPrimaryImageTag || (item.ImageTags&&item.ImageTags.Primary) || '';
+      const img = sid && tag ? `${server}/Items/${sid}/Images/Primary?maxHeight=300&quality=85&tag=${tag}&api_key=${token}` : '';
+      const title = item.SeriesName || item.Name || '';
+      const ep  = (item.ParentIndexNumber!=null&&item.IndexNumber!=null) ? `S${pad(item.ParentIndexNumber)}:E${pad(item.IndexNumber)}` : '';
+      const sub = ep ? `${ep}${item.Name?' – '+item.Name:' – TBA'}` : (item.Name||'');
+      const langs = (item.MediaStreams||[]).filter(s=>s.Type==='Audio').map(s=>(s.Language||'').toLowerCase());
+      const badge = langs.some(l=>l==='ger'||l==='deu'||l==='de') ? 'GER'
+                  : langs.some(l=>l==='eng'||l==='en') ? 'ENG' : '';
+      return `<div class="jf-card" onclick="document.getElementById('jf-overlay').remove();window.location.hash='/details?id=${sid}'">
+        <div class="jf-card-img">
+          ${img?`<img src="${img}" alt="" onerror="this.remove()">`:''}
+          ${badge?`<span class="jf-dub-badge">${badge}</span>`:''}
+        </div>
+        <div class="jf-card-t">${title}</div>
+        <div class="jf-card-s">${sub}</div>
+      </div>`;
+    }).join('');
+  };
+
+  const renderAll = (days, groups, server, token) => {
+    const body = document.getElementById('jf-overlay-body');
+    if (!body) return;
+    body.innerHTML = days.map(d => {
+      const k = toKey(d); const lbl = fmtDayLabel(d);
+      return `<div class="jf-day-section" id="jf-sec-${k}">
+        <h2>${lbl.day} ${lbl.date}</h2>
+        <div class="jf-cards">${buildCards(groups[k]||[], server, token)}</div>
+      </div>`;
+    }).join('');
+    body.scrollTop = 0;
+  };
+
+  const renderOne = (key, label, groups, server, token) => {
+    const body = document.getElementById('jf-overlay-body');
+    if (!body) return;
+    body.innerHTML = `<div class="jf-day-section">
+      <h2>${label}</h2>
+      <div class="jf-cards">${buildCards(groups[key]||[], server, token)}</div>
+    </div>`;
+    body.scrollTop = 0;
+  };
+
   const openCalendar = async () => {
     injectCSS();
-
     const days = [];
     const today = new Date(); today.setHours(0,0,0,0);
     for (let i=0; i<7; i++) {
-      const d = new Date(today); d.setDate(today.getDate()+i);
-      days.push(d);
+      const d = new Date(today); d.setDate(today.getDate()+i); days.push(d);
     }
     const cutoff = new Date(days[6]); cutoff.setHours(23,59,59,999);
 
     const navHTML = days.map(d => {
-      const k = toKey(d);
-      const l = fmtDayLabel(d);
-      return `<button class="jf-day-btn" data-key="${k}">
+      const k = toKey(d); const l = fmtDayLabel(d);
+      return `<button class="jf-day-btn" data-key="${k}" data-label="${l.day} ${l.date}">
         <span class="btn-day">${l.day.substring(0,3)}</span>
         <span class="btn-date">${l.date}</span>
       </button>`;
@@ -178,10 +207,6 @@
         ImageTypeLimit: 1, EnableImageTypes: 'Primary'
       }));
 
-      const body = document.getElementById('jf-overlay-body');
-      if (!body) return;
-
-      // Group by key
       const groups = {};
       (data.Items||[]).forEach(i => {
         const raw = i.PremiereDate||i.StartDate||'';
@@ -194,80 +219,55 @@
         groups[k].push(i);
       });
 
-      // Render ALL days at once (scrollable)
-      body.innerHTML = days.map(d => {
-        const k   = toKey(d);
-        const lbl = fmtDayLabel(d);
-        const header = `${lbl.day} ${lbl.date}`;
-        const items = groups[k] || [];
-
-        const cardsHTML = items.length
-          ? items.map(item => {
-              const sid = item.SeriesId || item.Id;
-              const tag = item.SeriesPrimaryImageTag || (item.ImageTags&&item.ImageTags.Primary) || '';
-              const img = sid && tag ? `${server}/Items/${sid}/Images/Primary?maxHeight=300&quality=85&tag=${tag}&api_key=${token}` : '';
-              const title = item.SeriesName || item.Name || '';
-              const ep  = (item.ParentIndexNumber!=null&&item.IndexNumber!=null) ? `S${pad(item.ParentIndexNumber)}:E${pad(item.IndexNumber)}` : '';
-              const sub = ep ? `${ep}${item.Name?' – '+item.Name:' – TBA'}` : (item.Name||'');
-              const langs = (item.MediaStreams||[]).filter(s=>s.Type==='Audio').map(s=>(s.Language||'').toLowerCase());
-              const isGer = langs.some(l=>l==='ger'||l==='deu'||l==='de');
-              const isEng = langs.some(l=>l==='eng'||l==='en');
-              const badge = isGer ? 'GER' : isEng ? 'ENG' : '';
-              return `<div class="jf-card" onclick="document.getElementById('jf-overlay').remove();window.location.hash='/details?id=${sid}'">
-                <div class="jf-card-img">
-                  ${img?`<img src="${img}" alt="" onerror="this.remove()">`:''}
-                  ${badge?`<span class="jf-dub-badge">${badge}</span>`:''}
-                </div>
-                <div class="jf-card-t">${title}</div>
-                <div class="jf-card-s">${sub}</div>
-              </div>`;
-            }).join('')
-          : `<div class="jf-no-ep">No episodes scheduled.</div>`;
-
-        return `<div class="jf-day-section" id="jf-day-${k}">
-          <h2>${header}</h2>
-          <div class="jf-cards">${cardsHTML}</div>
-        </div>`;
-      }).join('');
-
-      // Mark empty buttons
       days.forEach(d => {
         const k = toKey(d);
         const btn = overlay.querySelector(`.jf-day-btn[data-key="${k}"]`);
         if (btn && !groups[k]) btn.classList.add('empty');
       });
 
-      // Day button → scroll to section + highlight button
-      const bodyEl = document.getElementById('jf-overlay-body');
-      overlay.querySelectorAll('.jf-day-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          overlay.querySelectorAll('.jf-day-btn').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          const section = document.getElementById(`jf-day-${btn.dataset.key}`);
-          if (section) section.scrollIntoView({ behavior:'smooth', block:'start' });
-        });
-      });
+      renderAll(days, groups, server, token);
 
-      // Highlight active button while scrolling
+      let filterActive = false;
+      const bodyEl = document.getElementById('jf-overlay-body');
+
       const observer = new IntersectionObserver(entries => {
+        if (filterActive) return;
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            const key = entry.target.id.replace('jf-day-','');
-            overlay.querySelectorAll('.jf-day-btn').forEach(b => {
-              b.classList.toggle('active', b.dataset.key === key);
-            });
+            const key = entry.target.id.replace('jf-sec-','');
+            overlay.querySelectorAll('.jf-day-btn').forEach(b =>
+              b.classList.toggle('active', b.dataset.key === key)
+            );
           }
         });
-      }, { root: bodyEl, threshold: 0.3 });
+      }, { root: bodyEl, threshold: 0.4 });
 
       days.forEach(d => {
-        const sec = document.getElementById(`jf-day-${toKey(d)}`);
+        const sec = document.getElementById(`jf-sec-${toKey(d)}`);
         if (sec) observer.observe(sec);
       });
 
-      // Activate today's button
-      const todayBtn = overlay.querySelector(`.jf-day-btn[data-key="${toKey(today)}"]`);
-      if (todayBtn) todayBtn.classList.add('active');
+      overlay.querySelectorAll('.jf-day-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const wasActive = btn.classList.contains('active') && filterActive;
+          if (wasActive) {
+            filterActive = false;
+            overlay.querySelectorAll('.jf-day-btn').forEach(b => b.classList.remove('active'));
+            renderAll(days, groups, server, token);
+            setTimeout(() => {
+              days.forEach(d => {
+                const sec = document.getElementById(`jf-sec-${toKey(d)}`);
+                if (sec) observer.observe(sec);
+              });
+            }, 100);
+          } else {
+            filterActive = true;
+            overlay.querySelectorAll('.jf-day-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderOne(btn.dataset.key, btn.dataset.label, groups, server, token);
+          }
+        });
+      });
 
     } catch (e) {
       const body = document.getElementById('jf-overlay-body');
@@ -284,16 +284,12 @@
     if (!btn.dataset.jfCal) {
       btn.dataset.jfCal = '1';
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+        e.preventDefault(); e.stopImmediatePropagation();
         if (document.getElementById('jf-overlay')) { closeCalendar(); return; }
         openCalendar();
       }, true);
     }
   };
 
-  setInterval(() => {
-    if (typeof ApiClient !== 'undefined') { injectCSS(); patchCalTab(); }
-  }, 400);
-
+  setInterval(() => { if (typeof ApiClient !== 'undefined') { injectCSS(); patchCalTab(); } }, 400);
 })();
