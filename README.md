@@ -1,75 +1,70 @@
-# 📅 Jellyfin Calendar Tab
+📅 Jellyfin Calendar Tab
+A custom tab for Jellyfin that opens a "Coming Up" popup directly on the home screen — styled with a glassmorphism effect to match the Ultrachromic theme.
 
-A custom tab for Jellyfin that opens a **"Coming Up" popup** directly on the home screen — styled with a glassmorphism effect to match the [Ultrachromic](https://github.com/CTalvio/Ultrachromic) theme.
+✨ Features
+Integrated UI: Calendar icon tab placed next to Bookmarks, Watchlist, etc.
 
-![Jellyfin](https://img.shields.io/badge/Jellyfin-10.x-blue?logo=jellyfin)
-![License](https://img.shields.io/badge/license-MIT-green)
+Glassmorphism Popup: Click opens a sleek overlay over the home screen — no page navigation.
 
----
+Smart Date Range: Automatically shows only the next 7 days from today.
 
-## ✨ Features
+Series Focus: Always loads series posters (not episode thumbnails) for a cleaner look.
 
-- Calendar icon tab placed next to Bookmarks, Watchlist etc.
-- Click opens a **glassmorphism popup** over the home screen — no page navigation
-- Automatically shows only the **next 7 days** from today
-- Content is **grouped by date** with full weekday names
-- Always loads **series posters** (not episode images)
-- Click on a card opens the series detail page
-- Close via **✕ button** or **ESC key**
-- Designed to match the Ultrachromic / Kaleidochromic theme
+Direct Navigation: Click on a card opens the series detail page instantly.
 
----
+Easy Exit: Close via the ✕ button or ESC key.
 
-## 📋 Requirements
+Themed: Specifically designed to match the Ultrachromic / Kaleidochromic visual style.
 
-- Jellyfin Server **10.8+**
-- Plugin: **[Custom Tabs](https://github.com/nicholasgundersondesign/jellyfin-plugin-custom-tabs)** — **required** for the tab button to appear
+📸 Screenshots
+Home Screen Integration
+Calendar Popup View
+<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 15 52 00" src="https://github.com/user-attachments/assets/37cbf120-6c16-4e9a-981d-41529683961c" />
+<img width="1440" height="900" alt="Bildschirmfoto 2026-03-31 um 15 52 04" src="https://github.com/user-attachments/assets/a34047f4-7d50-4aa4-86ba-cafe36635489" />
 
----
+📋 Requirements
+Jellyfin Server 10.8+
 
-## 🚀 Installation
+Plugin: Custom Tabs — required for the tab button to appear.
 
-### Step 1 — Create the Custom Tab ⚠️ Required
+🚀 Installation
+Step 1 — Create the Custom Tab ⚠️ Required
+The Custom Tab plugin is required. Without it, the tab button will not appear on the home screen.
 
-> **The Custom Tab plugin is required.** Without it, the tab button will not appear on the home screen.
+Open the Jellyfin Dashboard.
 
-1. Open the Jellyfin Dashboard
-2. Go to **Plugins → Custom Tabs**
-3. Click **Add Tab** and fill in:
-   - **Display Text:** `Calender` ← **must be spelled exactly like this**
-   - **HTML Content:** leave completely empty
-4. Save
+Go to Plugins → Custom Tabs.
 
-> ⚠️ The tab name **must** be `Calender` (with this exact spelling).
-> The JavaScript searches for a tab button whose text contains `calend` — if you rename it, the script will not find it and nothing will work.
+Click Add Tab and fill in:
 
----
+Display Text: Calender ← must be spelled exactly like this (the script looks for this string).
 
-### Step 2 — Add the JavaScript
+HTML Content: Leave completely empty.
 
-1. Go to Jellyfin Dashboard → **General → JS Injector**
-2. Paste the full contents of [`Calendar.js`](./Calendar.js) into the **Custom JavaScript** field
-3. Save and reload the page
+Save.
 
----
+⚠️ The tab name must be Calender. The JavaScript searches for a tab button whose text contains calend — if you rename it, the script will not find the trigger.
 
-## 📁 Files
+Step 2 — Add the JavaScript
+Go to Jellyfin Dashboard → General → JS Injector.
 
-| File | Description |
-|---|---|
-| `calendar.js` | Main script — tab patching, popup logic, API calls |
-| `custom.css` | Full CSS including Ultrachromic imports and tab icon styles |
-| `README.md` | This file |
+Paste the full contents of calendar.js into the Custom JavaScript field.
 
----
+Save and reload the page.
 
-## ⚠️ Known Limitations
+📁 Files
+File	Description
+calendar.js	Main script — tab patching, popup logic, API calls.
+custom.css	Full CSS including Ultrachromic imports and tab icon styles.
+README.md	This documentation.
+⚠️ Important Logic & Known Issues
+Empty Days: If a specific day (e.g., Thursday) has no scheduled releases in your library, that heading will be skipped and not displayed at all.
 
-- The `Shows/Upcoming` API ignores `MinPremiereDate` / `MaxPremiereDate` parameters, so the script loads up to 500 items and filters client-side to 7 days
-- The tab only appears on the **home screen**, not on library subpages (Series, Movies etc.)
+Missing Data: If the Jellyfin API provides no data/items for the entire 7-day range, the calendar will remain empty or not show items for those specific dates.
 
----
+API Filtering: The Shows/Upcoming API ignores MinPremiereDate / MaxPremiereDate parameters in some versions, so the script loads up to 500 items and filters them client-side.
 
-## 📄 License
+Scope: The tab only appears on the Home Screen, not on library subpages (Series, Movies, etc.).
 
+📄 License
 MIT — free to use and modify.
