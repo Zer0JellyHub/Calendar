@@ -61,7 +61,6 @@ The *Custom Tabs* plugin acts as the anchor. Without this step, the script won't
 | File | Description |
 | :--- | :--- |
 | `calendar.js` | Main logic: Tab patching, popup rendering, and API data fetching. |
-| `custom.css` | Stylesheet: Glassmorphism effects, Ultrachromic imports, and icon styling. |
 | `README.md` | This documentation. |
 
 ---
