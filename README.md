@@ -49,7 +49,7 @@ A custom tab for Jellyfin that opens a **"Coming Up" popup** directly on the hom
 
 ### Step 2 — Add the JavaScript
 
-1. Go to Jellyfin Dashboard → **General → Branding**
+1. Go to Jellyfin Dashboard → **General → JS Injector**
 2. Paste the full contents of [`calendar.js`](./calendar.js) into the **Custom JavaScript** field
 3. Save and reload the page
 
