@@ -48,7 +48,7 @@ The *Custom Tabs* plugin acts as the anchor. Without this step, the script won't
 > [!IMPORTANT]  
 > The tab name must be spelled exactly **Calender**. The script specifically searches for the string "calendar" to attach the popup logic. If renamed, the trigger will fail.
 
-### Step 2 — Add the JavaScript & CSS
+### Step 2 — Add the JavaScript
 1.  Go to **Jellyfin Dashboard**
 2.  Locate the **Custom JavaScript code** field.
 3.  Paste the full contents of [`calendar.js`](./calendar.js) into the field.
