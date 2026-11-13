@@ -94,16 +94,45 @@
     }
   `;
 
+
+  /* ── Header-Eintrag "Calendar": nur Kalender-Symbol, kein Text ──────────────
+     Reines CSS + ein data-Attribut, damit React-Elemente nicht verändert werden. */
+  const CAL_MASK = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/></svg>\")";
+  const HEADER_CSS = `
+    [data-jf-calbtn] { font-size:0 !important; }
+    [data-jf-calbtn] > * { display:none !important; }
+    [data-jf-calbtn]::before {
+      content:''; display:inline-block; flex:0 0 auto;
+      width:24px; height:24px; background:currentColor;
+      -webkit-mask:${CAL_MASK} center/contain no-repeat;
+      mask:${CAL_MASK} center/contain no-repeat;
+    }
+  `;
+
+  const markHeaderCalendar = () => {
+    document.querySelectorAll('.MuiToolbar-root a, .MuiToolbar-root button, .MuiToolbar-root [role="button"], .MuiToolbar-root [role="tab"]')
+      .forEach(el => {
+        if (el.dataset.jfCalbtn || el.closest('#jf-overlay')) return;
+        const txt = (el.textContent || '').trim();
+        if (txt.length > 20) return;               // keine Container, die mehrere Einträge enthalten
+        const hay = [txt, el.getAttribute('aria-label') || '', el.getAttribute('title') || '', el.getAttribute('href') || ''].join(' ').toLowerCase();
+        if (!hay.includes('calend')) return;
+        el.dataset.jfCalbtn = '1';
+        if (!el.getAttribute('title')) el.setAttribute('title', 'Calendar');
+        if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Calendar');
+      });
+  };
+
   const injectCSS = () => {
     if (document.getElementById('jf-cal-css')) return;
     const s = document.createElement('style');
-    s.id='jf-cal-css'; s.textContent=CSS;
+    s.id='jf-cal-css'; s.textContent=CSS + HEADER_CSS;
     document.head.appendChild(s);
   };
 
   const escHandler = e => { if (e.key==='Escape') closeCalendar(); };
 
-  const closeCalendar = () => {
+  let closeCalendar = () => {
     document.removeEventListener('keydown', escHandler);
     const o = document.getElementById('jf-overlay'); if (o) o.remove();
     document.querySelectorAll('[id^="customTabButton"]').forEach(b => {
@@ -320,20 +349,69 @@
     }
   };
 
-  const patchCalTab = () => {
-    const btn = [...document.querySelectorAll('[id^="customTabButton"]')]
-                .find(b => b.textContent.trim().toLowerCase().includes('calend'));
-    if (!btn) return;
-    if (!btn.querySelector('.jf-tab-icon')) btn.insertAdjacentHTML('afterbegin', CAL_ICON);
-    if (!btn.dataset.jfCal) {
-      btn.dataset.jfCal = '1';
-      btn.addEventListener('click', (e) => {
-        e.preventDefault(); e.stopImmediatePropagation();
-        if (document.getElementById('jf-overlay')) { closeCalendar(); return; }
-        openCalendar();
-      }, true);
-    }
+  /* ── Jellyfin 12 (MUI-Header): Klick auf "Calendar" abfangen ───────────────
+     Der alte Weg suchte [id^="customTabButton"] (Custom-Tabs-Plugin der
+     Jellyfin-10-Oberfläche). Die gibt es in Jellyfin 12 nicht mehr, deshalb
+     blieb die Seite leer. Jetzt: ein delegierter Klick-Handler, der jedes
+     Element mit "calend" im Text/Label/Link abfängt, und eine Routen-Prüfung
+     für den Fall, dass der Eintrag doch eine (leere) Seite öffnet. */
+
+  const isCalendarEl = el => {
+    if (!el || el.closest('#jf-overlay')) return false;
+    const hay = [
+      el.textContent || '',
+      el.getAttribute('aria-label') || '',
+      el.getAttribute('title') || '',
+      el.getAttribute('href') || '',
+      el.id || ''
+    ].join(' ').toLowerCase();
+    return hay.includes('calend');
   };
 
-  setInterval(() => { if (typeof ApiClient !== 'undefined') { injectCSS(); patchCalTab(); } }, 400);
+  const findCalendarTrigger = target => {
+    // nur Header/Tab-Elemente, nie Inhalte der Seite (z. B. Karten mit "Calendar" im Titel)
+    let el = target;
+    while (el && el !== document.body) {
+      const inNav = el.closest('.MuiToolbar-root, .MuiTabs-root, .MuiDrawer-root, .headerTabs, [id^="customTabButton"]');
+      if (inNav && el.matches('a, button, [role="button"], [role="tab"], [role="menuitem"], li')) {
+        if (isCalendarEl(el)) return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  };
+
+  document.addEventListener('click', e => {
+    const trigger = findCalendarTrigger(e.target);
+    if (!trigger) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (document.getElementById('jf-overlay')) { closeCalendar(); return; }
+    openCalendar();
+  }, true);
+
+  // Falls der Eintrag eine Route öffnet (z. B. #/…calendar…) und dort eine leere Seite liegt
+  let lastHash = '';
+  const checkRoute = () => {
+    const h = decodeURIComponent(location.hash || '').toLowerCase();
+    if (h === lastHash) return;
+    lastHash = h;
+    if (h.includes('calend') && !h.includes('details') && !document.getElementById('jf-overlay')) {
+      openCalendar();
+    }
+  };
+  window.addEventListener('hashchange', checkRoute);
+
+  // Schließen: wenn wir noch auf der leeren Kalender-Route stehen, zurück zur Startseite
+  const origClose = closeCalendar;
+  closeCalendar = () => {
+    origClose();
+    const h = decodeURIComponent(location.hash || '').toLowerCase();
+    if (h.includes('calend') && !h.includes('details')) location.hash = '/home';
+  };
+
+  setInterval(() => {
+    if (typeof ApiClient !== 'undefined') { injectCSS(); checkRoute(); }
+    markHeaderCalendar();
+  }, 400);
 })();
